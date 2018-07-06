@@ -42,8 +42,15 @@ pub fn get_data_from(path: &str) -> Result<Vec<String>> {
 fn save_data_to(path: &str, data: &[String]) -> Result<()> {
     let f = File::create(path)?;
     let mut buffer = BufWriter::new(f);
+    let new_line;
+    if cfg!(target_os = "linux") {
+        new_line = "\n";
+    } else {
+        // windows
+        new_line = "\r\n";
+    }
     for record in data {
-        buffer.write_fmt(format_args!("{}\n", record))?;
+        buffer.write_fmt(format_args!("{}{}", record, new_line))?;
     }
     Ok(())
 }
